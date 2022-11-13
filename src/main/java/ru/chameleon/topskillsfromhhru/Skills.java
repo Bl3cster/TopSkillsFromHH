@@ -15,12 +15,21 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class Skills {
 
     public static void main(String[] args) throws SearchException, IOException {
-        System.out.println(getVacancies("java разработчик"));
+        Scanner stringScanner = new Scanner(System.in);
+        System.out.println("Введите название профессии для поиска ключевых навыков. /n Для выхода из программы введите \"end\"");
+        String request = stringScanner.nextLine();
+
+        if (request.equals("end")) {
+            return;
+        }
+        System.out.println(getVacancies(request));
+        main(args);
     }
 
     public static Map<String, Integer> getVacancies(String request) throws SearchException, IOException {
