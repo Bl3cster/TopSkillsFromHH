@@ -32,10 +32,12 @@ public class Skills {
         }
         System.out.println("Введите минимальную желаемую зарплату:");
         int minSalary = stringScanner.nextInt();
-        System.out.println("Введите цифру 0, если у Вас нет опыта; \n" +
-                "Введите 1, если Ваш опыт от 1 года до 3 лет; \n"
-                + "Введите 2, если Ваш опыт от 3 до 6 лет; \n" +
-                "Введите 3, если Ваш опыт более 6 лет. \n");
+        System.out.println("""
+                Введите цифру 0, если у Вас нет опыта;\s
+                Введите 1, если Ваш опыт от 1 года до 3 лет;\s
+                Введите 2, если Ваш опыт от 3 до 6 лет;\s
+                Введите 3, если Ваш опыт более 6 лет.\s
+                """);
         int experience = stringScanner.nextInt();
         switch (experience) {
             case 0 -> System.out.println(getVacancies(request, minSalary, "noExperience"));
