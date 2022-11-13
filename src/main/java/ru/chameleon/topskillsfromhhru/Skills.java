@@ -19,26 +19,39 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import static ru.yaal.project.hhapi.dictionary.Constants.Experience.EXPERIENCES;
+
 public class Skills {
 
     public static void main(String[] args) throws SearchException, IOException {
         Scanner stringScanner = new Scanner(System.in);
-        System.out.println("Введите название профессии для поиска ключевых навыков. /n Для выхода из программы введите \"end\"");
+        System.out.println("Введите название профессии для поиска ключевых навыков. \n Для выхода из программы введите \"end\"");
         String request = stringScanner.nextLine();
-
         if (request.equals("end")) {
             return;
         }
-        System.out.println(getVacancies(request));
+        System.out.println("Введите минимальную желаемую зарплату:");
+        int minSalary = stringScanner.nextInt();
+        System.out.println("Введите цифру 0, если у Вас нет опыта; \n" +
+                "Введите 1, если Ваш опыт от 1 года до 3 лет; \n"
+                + "Введите 2, если Ваш опыт от 3 до 6 лет; \n" +
+                "Введите 3, если Ваш опыт более 6 лет. \n");
+        int experience = stringScanner.nextInt();
+        switch (experience) {
+            case 0 -> System.out.println(getVacancies(request, minSalary, "noExperience"));
+            case 1 -> System.out.println(getVacancies(request, minSalary, "between1And3"));
+            case 2 -> System.out.println(getVacancies(request, minSalary, "between3And6"));
+            case 3 -> System.out.println(getVacancies(request, minSalary, "moreThan6"));
+        }
         main(args);
     }
 
-    public static Map<String, Integer> getVacancies(String request) throws SearchException, IOException {
+    public static Map<String, Integer> getVacancies(String request, int minSalary, String experiences) throws SearchException, IOException {
         // get vacancies by name (limit = 100)
         VacancyList vacancies = HhApi.search(100,
                 new Text(request, Constants.VacancySearchFields.VACANCY_NAME),
-                new Salary(50000, 1000000, Constants.Currency.RUR),
-                Constants.Experience.BETWEEN_1_AND_3);
+                new Salary(minSalary, null, Constants.Currency.RUR),
+                EXPERIENCES.getById(experiences));
 
         Map<String, Integer> mapOfSkills = new HashMap<>();
         // iterate by vacancies
