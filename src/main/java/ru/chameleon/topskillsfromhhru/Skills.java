@@ -7,6 +7,7 @@ import ru.yaal.project.hhapi.HhApi;
 import ru.yaal.project.hhapi.dictionary.Constants;
 import ru.yaal.project.hhapi.search.SearchException;
 import ru.yaal.project.hhapi.search.parameter.Text;
+import ru.yaal.project.hhapi.vacancy.Salary;
 import ru.yaal.project.hhapi.vacancy.Vacancy;
 import ru.yaal.project.hhapi.vacancy.VacancyList;
 
@@ -34,7 +35,11 @@ public class Skills {
 
     public static Map<String, Integer> getVacancies(String request) throws SearchException, IOException {
         // get vacancies by name (limit = 100)
-        VacancyList vacancies = HhApi.search(100, new Text(request, Constants.VacancySearchFields.VACANCY_NAME));
+        VacancyList vacancies = HhApi.search(100,
+                new Text(request, Constants.VacancySearchFields.VACANCY_NAME),
+                new Salary(50000, 1000000, Constants.Currency.RUR),
+                Constants.Experience.BETWEEN_1_AND_3);
+
         Map<String, Integer> mapOfSkills = new HashMap<>();
         // iterate by vacancies
         for (Vacancy vacancy : vacancies) {
