@@ -98,7 +98,7 @@ public class Skills {
 
         List<Vacancy> vacancies = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
-            ISearch<VacancyList> search = new VacancySearch(100)
+            ISearch<VacancyList> search = new VacancySearch(10)
                     .addParameter(text)
                     .addParameter(salary)
                     .addParameter(experience)
