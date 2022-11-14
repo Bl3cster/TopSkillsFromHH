@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 import static ru.yaal.project.hhapi.dictionary.Constants.Currency.CURRENCIES;
 import static ru.yaal.project.hhapi.dictionary.Constants.Experience.EXPERIENCES;
-
+@SuppressWarnings(value = "NullPointerException")
 public class Skills {
     static String currency;
     static String experience;
@@ -43,7 +43,7 @@ public class Skills {
     static int topSkills = 10;
     private static final int limitVacanciesOnPage = 100;
 
-    public static void main(String[] args) throws SearchException, IOException {
+    public void findSkill() throws SearchException, IOException {
         Scanner scanner = new Scanner(System.in);
         System.out.println("""
                 Введите название профессии для поиска ключевых навыков.\s
@@ -51,7 +51,7 @@ public class Skills {
                 """);
         String request = scanner.nextLine();
         if (request.equals("end")) {
-            return;
+            System.exit(0);
         }
         System.out.println("""
                 Введите цифру 0, если хотите узнать подборку навыков по вакансии без учёта зарплаты
@@ -60,6 +60,7 @@ public class Skills {
                 """);
         int dreamJob = scanner.nextInt();
         if (dreamJob == 0) {
+            System.out.println("Не торопи, я думаю...");
             Map<String, Integer> map = getVacancies(request);
             System.out.println("Топ востребованных навыков по профессии " + request);
             for (Map.Entry<String, Integer> s : map.entrySet()) {
@@ -102,6 +103,7 @@ public class Skills {
                 case 2 -> experience = "between3And6";
                 case 3 -> experience = "moreThan6";
             }
+            System.out.println("Не торопи, я думаю...");
             Map<String, Integer> map = getVacancies(request, minSalary, experience, currency);
             System.out.println("Топ востребованных навыков по профессии " + request);
             for (Map.Entry<String, Integer> s : map.entrySet()) {
@@ -109,7 +111,7 @@ public class Skills {
             }
             System.out.println("Информация получена из " + countVacancies + " вакансий сайта hh.ru");
         }
-        main(args);
+        findSkill();
     }
 
     public static Map<String, Integer> getVacancies(String request, int minSalary, String experiences,
