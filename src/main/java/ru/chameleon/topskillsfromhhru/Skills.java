@@ -17,6 +17,7 @@ import ru.yaal.project.hhapi.vacancy.VacancySearch;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -86,17 +87,17 @@ public class Skills {
         }
         main(args);
     }
+
     public static Map<String, Integer> getVacancies(String request, int minSalary, String experiences, String currency) throws SearchException, IOException {
         // get vacancies by name (limit = 100)
         ISearchParameter text = new Text(request, Constants.VacancySearchFields.VACANCY_NAME);
         ISearchParameter salary = new Salary(minSalary, null, CURRENCIES.getById(currency));
         ISearchParameter experience = EXPERIENCES.getById(experiences);
         ISearchParameter onlyWithSalary = Constants.OnlyWithSalary.ON;
-        //ISearchParameter schedule = Constants.Schedule.REMOTE;
         Map<String, Integer> mapOfSkills;
 
         List<Vacancy> vacancies = new ArrayList<>();
-        for(int i = 0; i < 20; i++) {
+        for (int i = 0; i < 20; i++) {
             ISearch<VacancyList> search = new VacancySearch(100)
                     .addParameter(text)
                     .addParameter(salary)
@@ -119,7 +120,7 @@ public class Skills {
         ISearchParameter text = new Text(request, Constants.VacancySearchFields.VACANCY_NAME);
         Map<String, Integer> mapOfSkills;
         List<Vacancy> vacancies = new ArrayList<>();
-        for(int i = 0; i < 20; i++) {
+        for (int i = 0; i < 2; i++) {
             ISearch<VacancyList> search = new VacancySearch(100)
                     .addParameter(text)
                     .addParameter(new SearchParameterBox(SearchParamNames.PAGE, String.valueOf(i)));
@@ -134,21 +135,20 @@ public class Skills {
                         Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
 
-    private static Map<String, Integer> countSkills (List<Vacancy> vacancies) throws IOException {
+    private static Map<String, Integer> countSkills(List<Vacancy> vacancies) throws IOException {
         Map<String, Integer> mapOfSkills = new HashMap<>();
         List<JsonNode> listOfNodes = new ArrayList<>();
+        List<String> listOfSkills = new ArrayList<>();
         // iterate by vacancies
         for (Vacancy vacancy : vacancies) {
             ObjectNode objectNode = new ObjectMapper().readValue(vacancy.getUrl(), ObjectNode.class);
-            // iterate by skills
-            // iterate by skill names
             listOfNodes.addAll(objectNode.findValues("key_skills"));
-
         }
         for (JsonNode skill : listOfNodes) {
-            for (String name : skill.findValuesAsText("name")) {
-                mapOfSkills.put(name, mapOfSkills.getOrDefault(name, 0) + 1);
-            }
+            listOfSkills.addAll(skill.findValuesAsText("name"));
+        }
+        for (String name : listOfSkills) {
+            mapOfSkills.put(name, mapOfSkills.getOrDefault(name, 0) + 1);
         }
         return mapOfSkills;
     }
