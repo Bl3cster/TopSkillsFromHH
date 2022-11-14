@@ -136,16 +136,20 @@ public class Skills {
 
     private static Map<String, Integer> countSkills (List<Vacancy> vacancies) throws IOException {
         Map<String, Integer> mapOfSkills = new HashMap<>();
+        List<String> list = new ArrayList<>();
+        JsonNode buffSkill = null;
         // iterate by vacancies
         for (Vacancy vacancy : vacancies) {
             ObjectNode objectNode = new ObjectMapper().readValue(vacancy.getUrl(), ObjectNode.class);
             // iterate by skills
             for (JsonNode skill : objectNode.findValues("key_skills")) {
                 // iterate by skill names
-                for (String name : skill.findValuesAsText("name")) {
-                    mapOfSkills.put(name, mapOfSkills.getOrDefault(name, 0) + 1);
-                }
+                buffSkill = skill;
+                list.addAll(buffSkill.findValuesAsText("name"));
             }
+        }
+        for (String name : buffSkill.findValuesAsText("name")) {
+            mapOfSkills.put(name, mapOfSkills.getOrDefault(name, 0) + 1);
         }
         return mapOfSkills;
     }
