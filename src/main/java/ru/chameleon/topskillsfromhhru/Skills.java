@@ -16,14 +16,17 @@ import ru.yaal.project.hhapi.vacancy.VacancyList;
 import ru.yaal.project.hhapi.vacancy.VacancySearch;
 
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ru.yaal.project.hhapi.dictionary.Constants.Currency.CURRENCIES;
@@ -46,7 +49,11 @@ public class Skills {
                 """);
         int dreamJob = scanner.nextInt();
         if (dreamJob == 0) {
-            System.out.println(getVacancies(request));
+            Map<String, Integer> map = getVacancies(request);
+
+            for (Map.Entry<String, Integer> s : map.entrySet()) {
+                System.out.println(s.getKey() + " -> " + s.getValue());
+            }
         } else {
             System.out.println("""
                     Введите цифру 0, если хотите получать зарплату в рублях;\s
@@ -98,7 +105,7 @@ public class Skills {
 
         List<Vacancy> vacancies = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
-            ISearch<VacancyList> search = new VacancySearch(10)
+            ISearch<VacancyList> search = new VacancySearch(100)
                     .addParameter(text)
                     .addParameter(salary)
                     .addParameter(experience)
@@ -120,7 +127,7 @@ public class Skills {
         ISearchParameter text = new Text(request, Constants.VacancySearchFields.VACANCY_NAME);
         Map<String, Integer> mapOfSkills;
         List<Vacancy> vacancies = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 20; i++) {
             ISearch<VacancyList> search = new VacancySearch(100)
                     .addParameter(text)
                     .addParameter(new SearchParameterBox(SearchParamNames.PAGE, String.valueOf(i)));
@@ -137,18 +144,14 @@ public class Skills {
 
     private static Map<String, Integer> countSkills(List<Vacancy> vacancies) throws IOException {
         Map<String, Integer> mapOfSkills = new HashMap<>();
-        List<JsonNode> listOfNodes = new ArrayList<>();
-        List<String> listOfSkills = new ArrayList<>();
         // iterate by vacancies
         for (Vacancy vacancy : vacancies) {
             ObjectNode objectNode = new ObjectMapper().readValue(vacancy.getUrl(), ObjectNode.class);
-            listOfNodes.addAll(objectNode.findValues("key_skills"));
-        }
-        for (JsonNode skill : listOfNodes) {
-            listOfSkills.addAll(skill.findValuesAsText("name"));
-        }
-        for (String name : listOfSkills) {
-            mapOfSkills.put(name, mapOfSkills.getOrDefault(name, 0) + 1);
+            for (JsonNode node : objectNode.findValues("key_skills")) {
+                for (String skill : node.findValuesAsText("name")) {
+                    mapOfSkills.put(skill, mapOfSkills.getOrDefault(skill, 0) + 1);
+                }
+            }
         }
         return mapOfSkills;
     }
