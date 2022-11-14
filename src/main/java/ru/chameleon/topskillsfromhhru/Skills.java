@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 import static ru.yaal.project.hhapi.dictionary.Constants.Currency.CURRENCIES;
 import static ru.yaal.project.hhapi.dictionary.Constants.Experience.EXPERIENCES;
-@SuppressWarnings(value = "NullPointerException")
+
 public class Skills {
     static String currency;
     static String experience;
@@ -42,6 +42,7 @@ public class Skills {
      */
     static int topSkills = 10;
     private static final int limitVacanciesOnPage = 100;
+
 
     public void findSkill() throws SearchException, IOException {
         Scanner scanner = new Scanner(System.in);
