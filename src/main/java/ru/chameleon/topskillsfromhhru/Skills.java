@@ -16,17 +16,13 @@ import ru.yaal.project.hhapi.vacancy.VacancyList;
 import ru.yaal.project.hhapi.vacancy.VacancySearch;
 
 import java.io.IOException;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ru.yaal.project.hhapi.dictionary.Constants.Currency.CURRENCIES;
@@ -104,7 +100,7 @@ public class Skills {
         Map<String, Integer> mapOfSkills;
 
         List<Vacancy> vacancies = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 10; i++) {
             ISearch<VacancyList> search = new VacancySearch(100)
                     .addParameter(text)
                     .addParameter(salary)
@@ -127,7 +123,7 @@ public class Skills {
         ISearchParameter text = new Text(request, Constants.VacancySearchFields.VACANCY_NAME);
         Map<String, Integer> mapOfSkills;
         List<Vacancy> vacancies = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 10; i++) {
             ISearch<VacancyList> search = new VacancySearch(100)
                     .addParameter(text)
                     .addParameter(new SearchParameterBox(SearchParamNames.PAGE, String.valueOf(i)));
