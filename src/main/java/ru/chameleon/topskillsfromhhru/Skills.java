@@ -31,25 +31,41 @@ import static ru.yaal.project.hhapi.dictionary.Constants.Experience.EXPERIENCES;
 public class Skills {
     static String currency;
     static String experience;
+    private static int countVacancies;
+    /**
+     * Не больше 20 страниц, так как апи НН не даёт поиск более чем по 2000 вакансий.
+     * 1 страница = 100 вакансий
+     */
+    static int maxPage = 5;
+    /**
+     * Количество навыков, выводящихся на экран
+     */
+    static int topSkills = 10;
+    private static final int limitVacanciesOnPage = 100;
 
     public static void main(String[] args) throws SearchException, IOException {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Введите название профессии для поиска ключевых навыков. \n Для выхода из программы введите \"end\" \n");
+        System.out.println("""
+                Введите название профессии для поиска ключевых навыков.\s
+                 Для выхода из программы введите "end"\s
+                """);
         String request = scanner.nextLine();
         if (request.equals("end")) {
             return;
         }
         System.out.println("""
-                Введите цифру 0, если хотите узнать подборку навыков по вакансии без учёта зарплаты и прочих параметров;\s
+                Введите цифру 0, если хотите узнать подборку навыков по вакансии без учёта зарплаты
+                 и прочих параметров;\s
                 Введите 1, если желаете задать параметры поиска.
                 """);
         int dreamJob = scanner.nextInt();
         if (dreamJob == 0) {
             Map<String, Integer> map = getVacancies(request);
-
+            System.out.println("Топ востребованных навыков по профессии " + request);
             for (Map.Entry<String, Integer> s : map.entrySet()) {
-                System.out.println(s.getKey() + " -> " + s.getValue());
+                System.out.println(s.getKey() + " -> " + s.getValue() );
             }
+            System.out.println("Информация получена из " + countVacancies + " вакансий сайта hh.ru");
         } else {
             System.out.println("""
                     Введите цифру 0, если хотите получать зарплату в рублях;\s
@@ -86,12 +102,18 @@ public class Skills {
                 case 2 -> experience = "between3And6";
                 case 3 -> experience = "moreThan6";
             }
-            System.out.println(getVacancies(request, minSalary, experience, currency));
+            Map<String, Integer> map = getVacancies(request, minSalary, experience, currency);
+            System.out.println("Топ востребованных навыков по профессии " + request);
+            for (Map.Entry<String, Integer> s : map.entrySet()) {
+                System.out.println(s.getKey() + " -> " + s.getValue() );
+            }
+            System.out.println("Информация получена из " + countVacancies + " вакансий сайта hh.ru");
         }
         main(args);
     }
 
-    public static Map<String, Integer> getVacancies(String request, int minSalary, String experiences, String currency) throws SearchException, IOException {
+    public static Map<String, Integer> getVacancies(String request, int minSalary, String experiences,
+                                                    String currency) throws SearchException, IOException {
         // get vacancies by name (limit = 100)
         ISearchParameter text = new Text(request, Constants.VacancySearchFields.VACANCY_NAME);
         ISearchParameter salary = new Salary(minSalary, null, CURRENCIES.getById(currency));
@@ -100,8 +122,8 @@ public class Skills {
         Map<String, Integer> mapOfSkills;
 
         List<Vacancy> vacancies = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            ISearch<VacancyList> search = new VacancySearch(100)
+        for (int i = 0; i < maxPage; i++) {
+            ISearch<VacancyList> search = new VacancySearch(limitVacanciesOnPage)
                     .addParameter(text)
                     .addParameter(salary)
                     .addParameter(experience)
@@ -109,11 +131,12 @@ public class Skills {
                     .addParameter(new SearchParameterBox(SearchParamNames.PAGE, String.valueOf(i)));
             vacancies.addAll(search.search());
         }
+        countVacancies = vacancies.size();
         mapOfSkills = countSkills(vacancies);
         // return sorted map of skills
         return mapOfSkills.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .limit(10)
+                .limit(topSkills)
                 .collect(Collectors.toMap(
                         Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
@@ -123,17 +146,18 @@ public class Skills {
         ISearchParameter text = new Text(request, Constants.VacancySearchFields.VACANCY_NAME);
         Map<String, Integer> mapOfSkills;
         List<Vacancy> vacancies = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            ISearch<VacancyList> search = new VacancySearch(100)
+        for (int i = 0; i < maxPage; i++) {
+            ISearch<VacancyList> search = new VacancySearch(limitVacanciesOnPage)
                     .addParameter(text)
                     .addParameter(new SearchParameterBox(SearchParamNames.PAGE, String.valueOf(i)));
             vacancies.addAll(search.search());
         }
+        countVacancies = vacancies.size();
         mapOfSkills = countSkills(vacancies);
         // return sorted map of skills
         return mapOfSkills.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .limit(10)
+                .limit(topSkills)
                 .collect(Collectors.toMap(
                         Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
