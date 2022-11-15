@@ -29,6 +29,7 @@ import static ru.yaal.project.hhapi.dictionary.Constants.Currency.CURRENCIES;
 import static ru.yaal.project.hhapi.dictionary.Constants.Experience.EXPERIENCES;
 
 public class Skills {
+    private int minSalary;
     static String currency;
     static String experience;
     private static int countVacancies;
@@ -70,40 +71,39 @@ public class Skills {
             System.out.println("Информация получена из " + countVacancies + " вакансий сайта hh.ru");
         } else {
             System.out.println("""
-                    Введите цифру 0, если хотите получать зарплату в рублях;\s
-                    Введите 1, если хотите получать зарплату в долларах;\s
-                    Введите 2, если хотите получать зарплату в евро;\s
-                    Введите 3, если хотите получать зарплату в манатах\s
-                    Введите 4, если хотите получать зарплату в белорусских рублях\s
-                    Введите 5, если хотите получать зарплату в тенге\s
-                    Введите 6, если хотите получать зарплату в гривнах
-                    """);
-            int currencyFind = scanner.nextInt();
-            switch (currencyFind) {
-                case 0 -> currency = "RUR";
-                case 1 -> currency = "USD";
-                case 2 -> currency = "EUR";
-                case 4 -> currency = "AZN";
-                case 5 -> currency = "BYR";
-                case 6 -> currency = "KZT";
-                case 7 -> currency = "UAH";
-
-            }
-            System.out.println("Введите минимальную желаемую зарплату: \n");
-            int minSalary = scanner.nextInt();
-            System.out.println("""
-                    Введите цифру 0, если у Вас нет опыта;\s
-                    Введите 1, если Ваш опыт от 1 года до 3 лет;\s
-                    Введите 2, если Ваш опыт от 3 до 6 лет;\s
-                    Введите 3, если Ваш опыт более 6 лет.
-                    """);
+                        Введите цифру 0, если у Вас нет опыта;\s
+                        Введите 1, если Ваш опыт от 1 года до 3 лет;\s
+                        Введите 2, если Ваш опыт от 3 до 6 лет;\s
+                        Введите 3, если Ваш опыт более 6 лет.
+                        """);
             int experienceFind = scanner.nextInt();
             switch (experienceFind) {
                 case 0 -> experience = "noExperience";
                 case 1 -> experience = "between1And3";
                 case 2 -> experience = "between3And6";
                 case 3 -> experience = "moreThan6";
+            }System.out.println("""
+                    Введите цифру 0, если хотите получать зарплату в рублях;\s
+                    Введите 1, если хотите получать зарплату в долларах;\s
+                    Введите 2, если хотите получать зарплату в евро;\s
+                    Введите 3, если хотите получать зарплату в манатах\s
+                    Введите 4, если хотите получать зарплату в белорусских рублях\s
+                    Введите 5, если хотите получать зарплату в тенге\s
+                    Введите 6, если хотите получать зарплату в гривнах\s
+                    """);
+            int currencyFind = scanner.nextInt();
+            switch (currencyFind) {
+                case 0 -> currency = "RUR";
+                case 1 -> currency = "USD";
+                case 2 -> currency = "EUR";
+                case 3 -> currency = "AZN";
+                case 4 -> currency = "BYR";
+                case 5 -> currency = "KZT";
+                case 6 -> currency = "UAH";
+
             }
+                System.out.println("Введите минимальную желаемую зарплату: \n");
+                minSalary = scanner.nextInt();
             System.out.println("Не торопи, я думаю...");
             Map<String, Integer> map = getVacancies(request, minSalary, experience, currency);
             System.out.println("Топ востребованных навыков по профессии " + request);
@@ -121,7 +121,7 @@ public class Skills {
         ISearchParameter text = new Text(request, Constants.VacancySearchFields.VACANCY_NAME);
         ISearchParameter salary = new Salary(minSalary, null, CURRENCIES.getById(currency));
         ISearchParameter experience = EXPERIENCES.getById(experiences);
-        ISearchParameter onlyWithSalary = Constants.OnlyWithSalary.ON;
+        ISearchParameter onlyWithSalary = Constants.OnlyWithSalary.OFF;
         Map<String, Integer> mapOfSkills;
 
         List<Vacancy> vacancies = new ArrayList<>();
